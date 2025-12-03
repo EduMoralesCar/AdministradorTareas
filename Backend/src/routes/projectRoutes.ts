@@ -10,7 +10,7 @@ const router = Router();
 
 // Definimos las rutas relacionadas con los proyectos aquí
 // Crear un nuevo proyecto
-router.post('/', 
+router.post('/',
     body('projectName').notEmpty().withMessage('El nombre del proyecto es obligatorio'),
     body('clientName').notEmpty().withMessage('El nombre del cliente es obligatorio'),
     body('description').isLength({ min: 10 }).withMessage('La descripción debe tener al menos 10 caracteres'),
@@ -18,14 +18,17 @@ router.post('/',
     ProjectController.createProject
 );
 
+
 // Obtener todos los proyectos
 router.get('/', ProjectController.getProjects);
 
+
 // Obtener un proyecto por ID y validar el ID
 router.get('/:id',
-    param('id').isMongoId().withMessage('ID de proyecto inválido'), 
+    param('id').isMongoId().withMessage('ID de proyecto inválido'),
     habdleValidationErrors,
     ProjectController.getProjectById);
+
 
 // Actualizar un proyecto por ID con validación
 router.put('/:id',
@@ -36,6 +39,7 @@ router.put('/:id',
     habdleValidationErrors,
     ProjectController.updateProject
 );
+
 
 // Eliminar un proyecto por ID con validación
 router.delete('/:id',
@@ -57,16 +61,36 @@ router.post('/:projectId/tasks',
     TaskController.createTask
 );
 
+
 // Obtener todas las tareas de un proyecto
 router.get('/:projectId/tasks',
     TaskController.getTasksByProject
 );
+
 
 // Obtener una tarea específica por ID dentro de un proyecto
 router.get('/:projectId/tasks/:taskId',
     param('taskId').isMongoId().withMessage('ID de tarea inválido'),
     habdleValidationErrors,
     TaskController.getTaskById
+);
+
+
+// Actualizar una tarea específica por ID dentro de un proyecto
+router.put('/:projectId/tasks/:taskId',
+    param('taskId').isMongoId().withMessage('ID de tarea inválido'),
+    body('title').notEmpty().withMessage('El título de la tarea es obligatorio'),
+    body('description').isLength({ min: 5 }).withMessage('La descripción debe tener al menos 5 caracteres'),
+    habdleValidationErrors,
+    TaskController.updateTask
+);
+
+
+// Eliminar una tarea específica por ID dentro de un proyecto
+router.delete('/:projectId/tasks/:taskId',
+    param('taskId').isMongoId().withMessage('ID de tarea inválido'),
+    habdleValidationErrors,
+    TaskController.deleteTask
 );
 
 export default router;

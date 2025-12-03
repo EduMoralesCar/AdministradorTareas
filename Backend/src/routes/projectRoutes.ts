@@ -46,9 +46,10 @@ router.delete('/:id',
 
 
 /** Routes for Tasks */
-// Creación de tareas
+router.param('projectId', validateProjectExists);
+
+// Crear una nueva tarea dentro de un proyecto
 router.post('/:projectId/tasks',
-    validateProjectExists,
     body('title').notEmpty().withMessage('El título de la tarea es obligatorio'),
     body('description').isLength({ min: 5 }).withMessage('La descripción debe tener al menos 5 caracteres'),
     body('dueDate').isISO8601().withMessage('La fecha de vencimiento debe ser una fecha válida'),
@@ -56,10 +57,16 @@ router.post('/:projectId/tasks',
     TaskController.createTask
 );
 
-
+// Obtener todas las tareas de un proyecto
 router.get('/:projectId/tasks',
-    validateProjectExists,
     TaskController.getTasksByProject
+);
+
+// Obtener una tarea específica por ID dentro de un proyecto
+router.get('/:projectId/tasks/:taskId',
+    param('taskId').isMongoId().withMessage('ID de tarea inválido'),
+    habdleValidationErrors,
+    TaskController.getTaskById
 );
 
 export default router;

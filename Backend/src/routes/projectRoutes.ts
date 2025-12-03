@@ -2,6 +2,9 @@ import { Router } from 'express';
 import { body, param } from 'express-validator';
 import { ProjectController } from '../controllers/ProjectController';
 import { habdleValidationErrors } from '../middleware/validation';
+import { TaskController } from '../controllers/TaskController';
+import { validateProjectExists } from '../middleware/project';
+
 
 const router = Router();
 
@@ -39,6 +42,31 @@ router.delete('/:id',
     param('id').isMongoId().withMessage('ID de proyecto inválido'),
     habdleValidationErrors,
     ProjectController.deleteProject
+);
+
+
+/** Routes for Tasks */
+router.param('projectId', validateProjectExists);
+
+// Crear una nueva tarea dentro de un proyecto
+router.post('/:projectId/tasks',
+    body('title').notEmpty().withMessage('El título de la tarea es obligatorio'),
+    body('description').isLength({ min: 5 }).withMessage('La descripción debe tener al menos 5 caracteres'),
+    body('dueDate').isISO8601().withMessage('La fecha de vencimiento debe ser una fecha válida'),
+    habdleValidationErrors,
+    TaskController.createTask
+);
+
+// Obtener todas las tareas de un proyecto
+router.get('/:projectId/tasks',
+    TaskController.getTasksByProject
+);
+
+// Obtener una tarea específica por ID dentro de un proyecto
+router.get('/:projectId/tasks/:taskId',
+    param('taskId').isMongoId().withMessage('ID de tarea inválido'),
+    habdleValidationErrors,
+    TaskController.getTaskById
 );
 
 export default router;

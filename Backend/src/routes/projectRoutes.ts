@@ -2,6 +2,9 @@ import { Router } from 'express';
 import { body, param } from 'express-validator';
 import { ProjectController } from '../controllers/ProjectController';
 import { habdleValidationErrors } from '../middleware/validation';
+import { TaskController } from '../controllers/TaskController';
+import { validateProjectExists } from '../middleware/project';
+
 
 const router = Router();
 
@@ -39,6 +42,24 @@ router.delete('/:id',
     param('id').isMongoId().withMessage('ID de proyecto inválido'),
     habdleValidationErrors,
     ProjectController.deleteProject
+);
+
+
+/** Routes for Tasks */
+// Creación de tareas
+router.post('/:projectId/tasks',
+    validateProjectExists,
+    body('title').notEmpty().withMessage('El título de la tarea es obligatorio'),
+    body('description').isLength({ min: 5 }).withMessage('La descripción debe tener al menos 5 caracteres'),
+    body('dueDate').isISO8601().withMessage('La fecha de vencimiento debe ser una fecha válida'),
+    habdleValidationErrors,
+    TaskController.createTask
+);
+
+
+router.get('/:projectId/tasks',
+    validateProjectExists,
+    TaskController.getTasksByProject
 );
 
 export default router;

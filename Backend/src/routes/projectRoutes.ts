@@ -4,6 +4,7 @@ import { ProjectController } from '../controllers/ProjectController';
 import { habdleValidationErrors } from '../middleware/validation';
 import { TaskController } from '../controllers/TaskController';
 import { validateProjectExists } from '../middleware/project';
+import { validateTaskExists } from '../middleware/task';
 
 
 const router = Router();
@@ -67,6 +68,8 @@ router.get('/:projectId/tasks',
     TaskController.getTasksByProject
 );
 
+// Aquí podrías agregar un middleware para validar la existencia de la tarea si lo deseas
+router.param('taskId', validateTaskExists);
 
 // Obtener una tarea específica por ID dentro de un proyecto
 router.get('/:projectId/tasks/:taskId',

@@ -48,16 +48,9 @@ export class TaskController {
     // Método para obtener una tarea por ID
     static getTaskById = async (req: Request, res: Response) => {
         try {
-            const { taskId } = req.params;
-            const task = await Task.findById(taskId).populate('projectId');
-
-            if (!task) {
-                return res.status(404).json({ message: 'Tarea no encontrada' });
-            }
-
             // Normalizar ambos valores por si `projectId` está poblado (document) o es ObjectId
-            const taskProjectId = task.projectId
-                ? ((task.projectId as any)._id ? (task.projectId as any)._id.toString() : task.projectId.toString())
+            const taskProjectId = req.task?.projectId
+                ? ((req.task.projectId as any)._id ? (req.task.projectId as any)._id.toString() : req.task.projectId.toString())
                 : undefined;
             const reqProjectId = req.project?._id ? req.project._id.toString() : undefined;
 
@@ -66,7 +59,7 @@ export class TaskController {
                 return res.status(400).json({ message: error.message });
             }
 
-            return res.status(200).json({ task });
+            return res.status(200).json({ task: req.task });
         } catch (error) {
             return res.status(500).json({ message: (error as Error).message });
         }
@@ -76,26 +69,20 @@ export class TaskController {
     // Método para actualizar una tarea
     static updateTask = async (req: Request, res: Response) => {
         try {
-            const { taskId } = req.params;
-            const task = await Task.findById(taskId);
-
-            if (!task) {
-                return res.status(404).json({ message: 'Tarea no encontrada' });
-            }
             // Verificar que la tarea pertenece al proyecto
-            if (task.projectId.toString() !== req.project?._id.toString()) {
+            if (req.task!.projectId.toString() !== req.project?._id.toString()) {
                 const error = new Error('La tarea no pertenece a este proyecto');
                 return res.status(400).json({ message: error.message });
             }
             // Actualizar los campos de la tarea
-            task.title = req.body.title || task.title;
-            task.description = req.body.description || task.description;
+            req.task!.title = req.body.title || req.task!.title;
+            req.task!.description = req.body.description || req.task!.description;
             if (req.body.dueDate) {
-                task.dueDate = req.body.dueDate;
+                req.task!.dueDate = req.body.dueDate;
             }
-            await task.save();
+            await req.task!.save();
 
-            return res.status(200).json({ task });
+            return res.status(200).json({ task: req.task });
         } catch (error) {
             return res.status(500).json({ message: (error as Error).message });
         }
@@ -105,19 +92,14 @@ export class TaskController {
     // Método para eliminar una tarea
     static deleteTask = async (req: Request, res: Response) => {
         try {
-            const { taskId } = req.params;
-            const task = await Task.findById(taskId);
-            if (!task) {
-                return res.status(404).json({ message: 'Tarea no encontrada' });
-            }
             // Verificar que la tarea pertenece al proyecto
-            if (task.projectId.toString() !== req.project?._id.toString()) {
+            if (req.task!.projectId.toString() !== req.project?._id.toString()) {
                 const error = new Error('La tarea no pertenece a este proyecto');
                 return res.status(400).json({ message: error.message });
             }
             // Eliminar 1 tarea de la referencia de la tarea del proyecto
-            req.project!.tasks = req.project!.tasks.filter(tid => tid.toString() !== taskId);
-            await Promise.all([task.deleteOne(), req.project?.save()]);
+            req.project!.tasks = req.project!.tasks.filter(tid => tid.toString() !== req.task!._id.toString());
+            await Promise.all([req.task!.deleteOne(), req.project?.save()]);
             return res.status(200).json({ message: 'Tarea eliminada correctamente' });
 
         } catch (error) {
@@ -129,22 +111,17 @@ export class TaskController {
     // Método para actualizar el estado de una tarea
     static updateTaskStatus = async (req: Request, res: Response) => {
         try {
-            const { taskId } = req.params;
             const { status } = req.body;
-            const task = await Task.findById(taskId);
 
-            if (!task) {
-                return res.status(404).json({ message: 'Tarea no encontrada' });
-            }
             // Verificar que la tarea pertenece al proyecto
-            if (task.projectId.toString() !== req.project?._id.toString()) {
+            if (req.task!.projectId.toString() !== req.project?._id.toString()) {
                 const error = new Error('La tarea no pertenece a este proyecto');
                 return res.status(400).json({ message: error.message });
             }
             // Actualizar el estado de la tarea
-            task.status = status;
-            await task.save();
-            return res.status(200).json({ task });
+            req.task!.status = status;
+            await req.task!.save();
+            return res.status(200).json({ task: req.task });
         } catch (error) {
             return res.status(500).json({ message: (error as Error).message });
         }

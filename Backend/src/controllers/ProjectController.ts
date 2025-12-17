@@ -7,13 +7,13 @@ export class ProjectController {
     static createProject = async (req: Request, res: Response) => {
 
         const project = new Project(req.body);
-        //console.log(req.body);
 
         try {
             await project.save();
-            res.send('Proyecto creado exitosamente');
+            res.status(201).json({ message: 'Proyecto creado exitosamente', project });
         } catch (error) {
             console.error(error);
+            res.status(500).json({ message: 'Error al crear el proyecto' });
         }
     }
 

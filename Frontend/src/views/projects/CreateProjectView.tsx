@@ -21,8 +21,9 @@ export default function CreateProjectView() {
     }
   });
 
-  const handleForm = (data: ProjectFormData) => {
-    createProject(data);
+  const handleForm = async (data: ProjectFormData) => {
+    await createProject(data);
+    console.log('Proyecto creado correctamente');
   };
 
 

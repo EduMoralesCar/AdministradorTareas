@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import ProjectForm from "@/components/projects/ProjectForm";
+import type { ProjectFormData } from "@/types";
 
 export default function CreateProjectView() {
 
-  const initialValues = {
+  const initialValues: ProjectFormData = {
     projectName: '',
     clientName: '',
     description: ''
@@ -19,7 +20,7 @@ export default function CreateProjectView() {
     }
   });
 
-  const handleForm = (data: any) => {
+  const handleForm = (data: ProjectFormData) => {
     console.log(data);
   };
 
@@ -45,7 +46,7 @@ export default function CreateProjectView() {
             type="submit"
             value="Crear Proyecto"
             className="bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold p-3 px-10 cursor-pointer transition-colors duration-300 w-full uppercase"
-            />
+          />
 
         </form>
 

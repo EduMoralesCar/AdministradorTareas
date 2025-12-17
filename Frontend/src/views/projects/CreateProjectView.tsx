@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import ProjectForm from "@/components/projects/ProjectForm";
-import type { ProjectFormData } from "@/types";
+import type { ProjectFormData } from "@/types/index";
+import { createProject } from "@/api/ProjectAPI";
 
 export default function CreateProjectView() {
 
@@ -20,8 +21,9 @@ export default function CreateProjectView() {
     }
   });
 
-  const handleForm = (data: ProjectFormData) => {
-    console.log(data);
+  const handleForm = async (data: ProjectFormData) => {
+    await createProject(data);
+    console.log('Proyecto creado correctamente');
   };
 
 

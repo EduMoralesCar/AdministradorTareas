@@ -1,5 +1,7 @@
 
 import { Outlet } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import Logo from '@/components/Logo'
 import { NavMenu } from '@/components/NavMenu'
 
@@ -23,8 +25,12 @@ export default function AppLayout() {
                 <p className='text-center'>
                     &copy; {new Date().getFullYear()} UpTask - Todos los derechos reservados
                 </p>
-
             </footer>
+
+            <ToastContainer
+                pauseOnFocusLoss={false} // Evita que las notificaciones se pausen al cambiar de ventana
+                pauseOnHover={false} // Evita que las notificaciones se pausen al pasar el cursor sobre ellas
+            />
         </>
     )
 }
